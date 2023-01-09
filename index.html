@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font: 13px Helvetica, Arial;
+      }
+      form {
+        background: #000;
+        padding: 3px;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+      }
+      form input {
+        border: 0;
+        padding: 10px;
+        width: 90%;
+        margin-right: 0.5%;
+      }
+      form button {
+        width: 9%;
+        background: rgb(130, 224, 255);
+        border: none;
+        padding: 10px;
+      }
+      #messages {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+      #messages li {
+        padding: 5px 10px;
+      }
+      #messages li:nth-child(odd) {
+        background: #eee;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <ul id="messageul">
+        <li v-for="message in messages">{{ message }}</li>
+      </ul>
+      <form action="">
+        <input id="m" autocomplete="off" v-model="textInput" />
+        <button v-on:click.prevent="sendMessage">Send</button>
+      </form>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module">
+      import { createApp } from 'https://cdn.jsdelivr.net/npm/vue@3.2.45/dist/vue.esm-browser.prod.js';
+      const socket = io('http://localhost:3000');
+      createApp({
+        data() {
+          return {
+            textInput: '',
+            messages: [],
+          };
+        },
+        methods: {
+          sendMessage() {
+            socket.emit('chat message', this.textInput);
+            this.textInput = '';
+          },
+        },
+        mounted() {
+          socket.on('chat message', (msg) => {
+            console.log(msg);
+            this.messages.push(msg);
+          });
+        },
+      }).mount('#app');
+    </script>
+  </body>
+</html>
